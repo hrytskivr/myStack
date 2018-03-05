@@ -1,0 +1,12 @@
+# folders
+venv
+node_modules
+.idea
+__pycache__
+app/*
+!app/Dockerfile
+!app/entry.sh
+
+# files
+db.sqlite3
+package-lock.json

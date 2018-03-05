@@ -1,0 +1,36 @@
+version: '3.6'
+
+services:
+  # application and web server
+  app:
+    image: my/app
+    deploy:
+      replicas: 1
+    volumes:
+      - ./app:/data/app
+    env_file: env
+    entrypoint: sh entry.sh
+
+  nginx:
+    image: my/nginx
+    deploy:
+      replicas: 1
+    ports:
+      - 80:80
+    volumes:
+      - ./app:/data/app
+
+  # database and caching
+  postgres:
+    image: postgres:alpine
+    deploy:
+      replicas: 1
+    env_file: env
+
+  memcached:
+    image: memcached:alpine
+    deploy:
+      replicas: 1
+    entrypoint:
+      - memcached
+      - -m 64
