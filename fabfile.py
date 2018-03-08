@@ -17,6 +17,7 @@ def init():
     clone_app()
     rename()
     build()
+    storage()
     up()
 
 
@@ -50,6 +51,9 @@ def build():
     local('docker build app/. -t my/app')
     local('docker build nginx/. -t my/nginx')
 
+def storage():
+    """ there has to be an empty directory for psql persistent storage """
+    local('mkdir postgres/storage')
 
 def up():
     """ use this to redeploy the stack after it was removed with 'down' """
