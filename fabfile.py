@@ -55,7 +55,7 @@ def storage():
 
 def up():
     """ use this to redeploy the stack after it was removed with 'down' """
-    local(f'docker stack deploy --compose-file docker-compose.yml {APP_NAME}')
+    local(f'docker stack deploy --compose-file docker-stack.yml {APP_NAME}')
 
 
 def down():
