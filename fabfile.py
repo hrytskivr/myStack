@@ -26,7 +26,6 @@ def update_app():
     local(f'cd app/{APP_NAME} git reset --hard && git pull')
     rename()
     build()
-    up()
 
 
 def update_stack():
@@ -34,7 +33,6 @@ def update_stack():
     local('git reset --hard && git pull')
     rename()
     build()
-    up()
 
 
 def clone_app():
