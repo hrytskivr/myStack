@@ -26,7 +26,7 @@ services:
     deploy:
       replicas: 1
     volumes:
-      - ./postgres/storage:/var/lib/postgresql
+      - ./postgres/storage:/var/lib/postgresql/data
     env_file: postgres/env
 
   memcached:
