@@ -1,6 +1,6 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 This script is used to control deployment process and make it as easy as possible for end user.
-Please do not forget to set host machine environment variables described under 'required info'.
+Please do not forget to set host machine environment variables listed under 'required info'.
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 import os
