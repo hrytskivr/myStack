@@ -8,7 +8,7 @@ services:
       replicas: 1
     volumes:
       - ./app:/data/app
-    env_file: env
+    env_file: postgres/env
     entrypoint: sh entry.sh
 
   nginx:
@@ -22,13 +22,15 @@ services:
 
   # database and caching
   postgres:
-    image: postgres:alpine
+    image: postgres:10.3-alpine
     deploy:
       replicas: 1
-    env_file: env
+    volumes:
+      - ./postgres/storage:/var/lib/postgresql/data
+    env_file: postgres/env
 
   memcached:
-    image: memcached:alpine
+    image: memcached:1.5-alpine
     deploy:
       replicas: 1
     entrypoint:

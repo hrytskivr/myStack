@@ -1,6 +1,6 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 This script is used to control deployment process and make it as easy as possible for end user.
-Please do not forget to set host machine environment variables described under 'required info'.
+Please do not forget to set host machine environment variables listed under 'required info'.
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 import os
@@ -17,6 +17,7 @@ def init():
     clone_app()
     rename()
     build()
+    storage()
     up()
 
 
@@ -25,7 +26,6 @@ def update_app():
     local(f'cd app/{APP_NAME} git reset --hard && git pull')
     rename()
     build()
-    up()
 
 
 def update_stack():
@@ -33,7 +33,6 @@ def update_stack():
     local('git reset --hard && git pull')
     rename()
     build()
-    up()
 
 
 def clone_app():
@@ -42,18 +41,21 @@ def clone_app():
 
 
 def rename():
-    local(f'sed -i "s/%APP_NAME%/{APP_NAME}/g" app/Dockerfile app/entry.sh nginx/sites-enabled/django env')
-    local(f'sed -i "s/%DB_PASS%/{DB_PASS}/g" env')
+    local(f'sed -i "s/%APP_NAME%/{APP_NAME}/g" app/Dockerfile app/entry.sh nginx/sites-enabled/django postgres/env')
+    local(f'sed -i "s/%DB_PASS%/{DB_PASS}/g" postgres/env')
 
 
 def build():
     local('docker build app/. -t my/app')
     local('docker build nginx/. -t my/nginx')
 
+def storage():
+    """ there has to be an empty directory for psql persistent storage """
+    local('mkdir postgres/storage')
 
 def up():
     """ use this to redeploy the stack after it was removed with 'down' """
-    local(f'docker stack deploy --compose-file docker-compose.yml {APP_NAME}')
+    local(f'docker stack deploy --compose-file docker-stack.yml {APP_NAME}')
 
 
 def down():
