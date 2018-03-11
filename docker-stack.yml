@@ -5,7 +5,7 @@ services:
   app:
     image: my/app
     deploy:
-      replicas: 1
+      %replicas: 1%
     volumes:
       - ./app:/data/app
     env_file: postgres/env
