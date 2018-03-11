@@ -8,10 +8,13 @@ from fabric.api import local
 
 # REQUIRED INFO
 HOST_IP = os.environ['HOST_IP']
-APP_NAME = os.environ['APP_NAME']
 REPO_URL = os.environ['REPO_URL']
-DB_PASS = os.environ['DB_PASS']
+APP_NAME = os.environ['APP_NAME']
 APP_REPLICAS = os.environ['APP_REPLICAS']
+
+DB_NAME = os.environ['DB_NAME']
+DB_USER = os.environ['DB_USER']
+DB_PASS = os.environ['DB_PASS']
 
 
 def init():
@@ -47,8 +50,8 @@ def clone_app():
 
 def rename():
     local(f'sed -i "s/%replicas: 1%/replicas: {APP_REPLICAS}/" docker-stack.yml')
-    local(f'sed -i "s/%APP_NAME%/{APP_NAME}/g" app/Dockerfile app/entry.sh nginx/sites-enabled/django postgres/env')
-    local(f'sed -i "s/%DB_PASS%/{DB_PASS}/g" postgres/env')
+    local(f'sed -i "s/%APP_NAME%/{APP_NAME}/g" app/Dockerfile app/entry.sh nginx/sites-enabled/django')
+    local(f'sed -i "s/%DB_NAME%/{DB_NAME}/; s/%DB_USER%/{DB_USER}/; s/%DB_PASS%/{DB_PASS}/" postgres/env')
     local(f'sed -i "s/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = [\'{HOST_IP}\']/" app/{APP_NAME}/{APP_NAME}/settings.py')
 
 
