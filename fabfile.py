@@ -7,6 +7,7 @@ import os
 from fabric.api import local
 
 # REQUIRED INFO
+HOST_IP = os.environ['HOST_IP']
 APP_NAME = os.environ['APP_NAME']
 REPO_URL = os.environ['REPO_URL']
 DB_PASS = os.environ['DB_PASS']
@@ -37,21 +38,24 @@ def update_stack():
 
 def clone_app():
     local(f'cd app && mkdir {APP_NAME} && git clone {REPO_URL}')
-    local(f'cd app/{APP_NAME} && git checkout prod')
+    local(f'cd app/{APP_NAME}')
 
 
 def rename():
     local(f'sed -i "s/%APP_NAME%/{APP_NAME}/g" app/Dockerfile app/entry.sh nginx/sites-enabled/django postgres/env')
     local(f'sed -i "s/%DB_PASS%/{DB_PASS}/g" postgres/env')
+    local(f'sed -i "s/ALLOWED_HOSTS = []/ALLOWED_HOSTS = [\'{HOST_IP}\']"')
 
 
 def build():
     local('docker build app/. -t my/app')
     local('docker build nginx/. -t my/nginx')
 
+
 def storage():
     """ there has to be an empty directory for psql persistent storage """
     local('mkdir postgres/storage')
+
 
 def up():
     """ use this to redeploy the stack after it was removed with 'down' """

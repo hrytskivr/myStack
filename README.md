@@ -14,8 +14,9 @@ This whole thing is set-up with idea of microservices architecture in head. Usin
 - **fabric3** (version _1.14_ tested)
 
 ### Usage
-- clone this repository onto your host
+- clone this repository onto your host machine
 - set required environment variables
+    - _HOST_IP_ - public ``ip address of your host machine
     - _APP_NAME_ - name of your Django application
     - _REPO_URL_ - git url of your Django application
     - _DB_PASS_ - desired database password
