@@ -23,4 +23,4 @@ This whole thing is set-up with idea of microservices architecture in head. Usin
 - run `fab init` and watch the magic happen
 
 **NOTE:** there is a set of useful commands defined in _fabfile.py_ to orchestrate the process, e.g. updating your app
-    on the fly.
+    on the fly as easy as `fab update:app`

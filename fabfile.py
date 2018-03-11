@@ -11,6 +11,7 @@ HOST_IP = os.environ['HOST_IP']
 APP_NAME = os.environ['APP_NAME']
 REPO_URL = os.environ['REPO_URL']
 DB_PASS = os.environ['DB_PASS']
+APP_REPLICAS = os.environ['APP_REPLICAS']
 
 
 def init():
@@ -22,18 +23,21 @@ def init():
     up()
 
 
-def update_app():
-    """ use this to update your application code from remote repo """
-    local(f'cd app/{APP_NAME} git reset --hard && git pull')
-    rename()
-    build()
+def scale_app(replicas):
+    """ use this to temporary tweak replicas count of the 'app service'
+    (NOTE: this effect will vanish on next 'stack down' command, use environment variable for permanent set-up) """
+    local(f'docker service scale {APP_NAME}_app={replicas}')
 
 
-def update_stack():
-    """ use this to update stack code from remote repo """
-    local('git reset --hard && git pull')
+def update(type):
+    """ use this to update 'stack/app' code base """
+    if type == "stack":
+        local('git reset --hard && git pull')
+    if type == "app":
+        local(f'cd app/{APP_NAME} git reset --hard && git pull')
     rename()
     build()
+    up()
 
 
 def clone_app():
@@ -42,6 +46,7 @@ def clone_app():
 
 
 def rename():
+    local(f'sed -i "s/%replicas: 1%/replicas: {APP_REPLICAS}" docker-stack.yml')
     local(f'sed -i "s/%APP_NAME%/{APP_NAME}/g" app/Dockerfile app/entry.sh nginx/sites-enabled/django postgres/env')
     local(f'sed -i "s/%DB_PASS%/{DB_PASS}/g" postgres/env')
     local(f'sed -i "s/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = [\'{HOST_IP}\']/" app/{APP_NAME}/{APP_NAME}/settings.py')
@@ -58,11 +63,12 @@ def storage():
 
 
 def up():
-    """ use this to redeploy the stack after it was removed with 'down' """
+    """ use this to redeploy the stack after it was removed with 'down'
+    or apply any custom changes made in 'docker-stack.yml' file """
     local(f'docker stack deploy --compose-file docker-stack.yml {APP_NAME}')
 
 
 def down():
     """ use this to remove stack from the host
-    (WARNING: will delete all the data inside every container) """
+    (WARNING: will delete all the data inside every container, except data stored directly on host e.g. 'postgres') """
     local(f'docker stack rm {APP_NAME}')
