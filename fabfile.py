@@ -46,7 +46,7 @@ def clone_app():
 
 
 def rename():
-    local(f'sed -i "s/%replicas: 1%/replicas: {APP_REPLICAS}" docker-stack.yml')
+    local(f'sed -i "s/%replicas: 1%/replicas: {APP_REPLICAS}/" docker-stack.yml')
     local(f'sed -i "s/%APP_NAME%/{APP_NAME}/g" app/Dockerfile app/entry.sh nginx/sites-enabled/django postgres/env')
     local(f'sed -i "s/%DB_PASS%/{DB_PASS}/g" postgres/env')
     local(f'sed -i "s/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = [\'{HOST_IP}\']/" app/{APP_NAME}/{APP_NAME}/settings.py')
