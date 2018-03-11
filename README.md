@@ -16,10 +16,6 @@ This whole thing is set-up with idea of microservices architecture in head. Usin
 ### Usage
 - clone this repository onto your host machine
 - set required environment variables
-    - _HOST_IP_ - public ``ip address of your host machine
-    - _APP_NAME_ - name of your Django application
-    - _REPO_URL_ - git url of your Django application
-    - _DB_PASS_ - desired database password
 - run `fab init` and watch the magic happen
 
 **NOTE:** there is a set of useful commands defined in _fabfile.py_ to orchestrate the process, e.g. updating your app

@@ -6,11 +6,12 @@ Please do not forget to set host machine environment variables listed under 'req
 import os
 from fabric.api import local
 
-# REQUIRED INFO
-HOST_IP = os.environ['HOST_IP']
-REPO_URL = os.environ['REPO_URL']
-APP_NAME = os.environ['APP_NAME']
-APP_REPLICAS = os.environ['APP_REPLICAS']
+""" REQUIRED INFO """
+HOST_IP = os.environ['HOST_IP']  # public ip address of your hosting machine
+REPO_URL = os.environ['REPO_URL']  # git url of your application repository
+REPO_NAME = os.environ['REPO_NAME']  # name of your application repository
+APP_NAME = os.environ['APP_NAME']  # name of your Django application
+APP_REPLICAS = os.environ['APP_REPLICAS']  # replicas count of Django application service to deploy
 
 DB_NAME = os.environ['DB_NAME']
 DB_USER = os.environ['DB_USER']
@@ -37,22 +38,22 @@ def update(type):
     if type == "stack":
         local('git reset --hard && git pull')
     if type == "app":
-        local(f'cd app/{APP_NAME} git reset --hard && git pull')
+        local(f'cd app/{REPO_NAME} git reset --hard && git pull')
     rename()
     build()
     up()
 
 
 def clone_app():
-    local(f'cd app && mkdir {APP_NAME} && git clone {REPO_URL}')
-    local(f'cd app/{APP_NAME}')
+    local(f'cd app && mkdir {REPO_NAME} && git clone {REPO_URL}')
+    local(f'cd app/{REPO_NAME}')
 
 
 def rename():
     local(f'sed -i "s/%replicas: 1%/replicas: {APP_REPLICAS}/" docker-stack.yml')
     local(f'sed -i "s/%APP_NAME%/{APP_NAME}/g" app/Dockerfile app/entry.sh nginx/sites-enabled/django')
     local(f'sed -i "s/%DB_NAME%/{DB_NAME}/; s/%DB_USER%/{DB_USER}/; s/%DB_PASS%/{DB_PASS}/" postgres/env')
-    local(f'sed -i "s/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = [\'{HOST_IP}\']/" app/{APP_NAME}/{APP_NAME}/settings.py')
+    local(f'sed -i "s/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = [\'{HOST_IP}\']/" app/{REPO_NAME}/{APP_NAME}/settings.py')
 
 
 def build():
