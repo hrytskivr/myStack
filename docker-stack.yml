@@ -3,22 +3,26 @@ version: '3.6'
 services:
   # application and web server
   app:
-    image: my/app
+    image: my/app:%COMMIT_HASH%
     deploy:
-      %replicas: 1%
+      %app_replicas: 1%
+      restart_policy:
+        max_attempts: 5
+        delay: 5s
     volumes:
       - ./app:/data/app
     env_file: postgres/env
     entrypoint: sh entry.sh
 
   nginx:
-    image: my/nginx
+    image: my/nginx:%COMMIT_HASH%
     deploy:
       replicas: 1
     ports:
       - 80:80
     volumes:
       - ./app:/data/app
+      - ./nginx/logs:/var/log/nginx
 
   # database and caching
   postgres:

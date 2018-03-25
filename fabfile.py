@@ -4,6 +4,7 @@ Please do not forget to set host machine environment variables listed under 'req
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 import os
+
 from fabric.api import local
 
 """ REQUIRED INFO """
@@ -17,13 +18,16 @@ DB_NAME = os.environ['DB_NAME']
 DB_USER = os.environ['DB_USER']
 DB_PASS = os.environ['DB_PASS']
 
+""" USEFUL CONSTANTS """
+COMMIT_HASH = local('git rev-parse --short HEAD', capture=True)
+
 
 def init():
     """ use this when deploying the stack for the first time """
     clone_app()
     rename()
     build()
-    storage()
+    storages()
     up()
 
 
@@ -46,24 +50,25 @@ def update(type):
 
 def clone_app():
     local(f'cd app && mkdir {REPO_NAME} && git clone {REPO_URL}')
-    local(f'cd app/{REPO_NAME}')
 
 
 def rename():
-    local(f'sed -i "s/%replicas: 1%/replicas: {APP_REPLICAS}/" docker-stack.yml')
+    local(f'sed -i "s/%app_replicas: 1%/replicas: {APP_REPLICAS}/" docker-stack.yml')
+    local(f'sed -i "s/%COMMIT_HASH%/{COMMIT_HASH}/g" docker-stack.yml')
     local(f'sed -i "s/%APP_NAME%/{APP_NAME}/g" app/Dockerfile app/entry.sh nginx/sites-enabled/django')
     local(f'sed -i "s/%DB_NAME%/{DB_NAME}/; s/%DB_USER%/{DB_USER}/; s/%DB_PASS%/{DB_PASS}/" postgres/env')
     local(f'sed -i "s/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = [\'{HOST_IP}\']/" app/{REPO_NAME}/{APP_NAME}/settings.py')
 
 
 def build():
-    local('docker build app/. -t my/app')
-    local('docker build nginx/. -t my/nginx')
+    local(f'docker build app/. -t my/app:{COMMIT_HASH}')
+    local(f'docker build nginx/. -t my/nginx:{COMMIT_HASH}')
 
 
-def storage():
-    """ there has to be an empty directory for psql persistent storage """
+def storages():
+    """ this creates persistent storage directories for psql and nginx services """
     local('mkdir postgres/storage')
+    local('mkdir nginx/logs')
 
 
 def up():
@@ -72,7 +77,19 @@ def up():
     local(f'docker stack deploy --compose-file docker-stack.yml {APP_NAME}')
 
 
-def down():
-    """ use this to remove stack from the host
-    (WARNING: will delete all the data inside every container, except data stored directly on host e.g. 'postgres') """
-    local(f'docker stack rm {APP_NAME}')
+def down(type):
+    """ use this to remove stack from the host """
+    if type == '-f':
+        print('Forced!')
+        local(f'docker stack rm {APP_NAME}')
+    else:
+        print('echo WARNING: will delete all the data inside every container, '
+              'except data stored directly on host e.g. "postgres".')
+        choice = input('Proceed? Yes/No\n=> ')
+        if choice == 'Yes':
+            print('Confirmed!')
+            local(f'docker stack rm {APP_NAME}')
+        elif choice == 'No':
+            print('Aborted!')
+        else:
+            print('Wrong input! ')

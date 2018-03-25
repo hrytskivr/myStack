@@ -7,7 +7,7 @@ RUN apk update \
     && pip install psycopg2==2.7.4 \
     && apk del build-deps
 
-# install additional packages
+# install application requirements
 WORKDIR /data/app
 COPY %APP_NAME%/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
