@@ -12,14 +12,10 @@ HOST_IP = os.environ['HOST_IP']  # public ip address of your hosting machine
 REPO_URL = os.environ['REPO_URL']  # git url of your application repository
 REPO_NAME = os.environ['REPO_NAME']  # name of your application repository
 APP_NAME = os.environ['APP_NAME']  # name of your Django application
-APP_REPLICAS = os.environ['APP_REPLICAS']  # replicas count of Django application service to deploy
 
 DB_NAME = os.environ['DB_NAME']
 DB_USER = os.environ['DB_USER']
 DB_PASS = os.environ['DB_PASS']
-
-""" USEFUL CONSTANTS """
-COMMIT_HASH = local('git rev-parse --short HEAD', capture=True)
 
 
 def init():
@@ -42,7 +38,7 @@ def update(type):
     if type == "stack":
         local('git reset --hard && git pull')
     if type == "app":
-        local(f'cd app/{REPO_NAME} git reset --hard && git pull')
+        local(f'cd app/{REPO_NAME} && git reset --hard && git pull')
     rename()
     build()
     up()
@@ -53,16 +49,15 @@ def clone_app():
 
 
 def rename():
-    local(f'sed -i "s/%app_replicas: 1%/replicas: {APP_REPLICAS}/" docker-stack.yml')
-    local(f'sed -i "s/%COMMIT_HASH%/{COMMIT_HASH}/g" docker-stack.yml')
+    local(f'sed -i "s/%COMMIT_HASH%/{get_hash()}/g" docker-stack.yml')
     local(f'sed -i "s/%APP_NAME%/{APP_NAME}/g" app/Dockerfile app/entry.sh nginx/sites-enabled/django')
     local(f'sed -i "s/%DB_NAME%/{DB_NAME}/; s/%DB_USER%/{DB_USER}/; s/%DB_PASS%/{DB_PASS}/" postgres/env')
     local(f'sed -i "s/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = [\'{HOST_IP}\']/" app/{REPO_NAME}/{APP_NAME}/settings.py')
 
 
 def build():
-    local(f'docker build app/. -t my/app:{COMMIT_HASH}')
-    local(f'docker build nginx/. -t my/nginx:{COMMIT_HASH}')
+    local(f'docker build app/. -t my/app:{get_hash()}')
+    local(f'docker build nginx/. -t my/nginx:{get_hash()}')
 
 
 def storages():
@@ -79,7 +74,7 @@ def up():
 
 def down(type):
     """ use this to remove stack from the host """
-    if type == '-f':
+    if type == "-f":
         print('Forced!')
         local(f'docker stack rm {APP_NAME}')
     else:
@@ -93,3 +88,8 @@ def down(type):
             print('Aborted!')
         else:
             print('Wrong input! ')
+
+
+def get_hash():
+    """ return last git commit hash """
+    return local('git rev-parse --short HEAD', capture=True)
