@@ -5,7 +5,7 @@ services:
   app:
     image: my/app:%COMMIT_HASH%
     deploy:
-      %app_replicas: 1%
+      replicas: 1
       restart_policy:
         max_attempts: 5
         delay: 5s
@@ -20,6 +20,7 @@ services:
       replicas: 1
     ports:
       - 80:80
+      - 443:443
     volumes:
       - ./app:/data/app
       - ./nginx/logs:/var/log/nginx

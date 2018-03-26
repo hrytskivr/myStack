@@ -2,12 +2,12 @@
 ##### Production-grade solution for Django application deployment
 
 ### About
-This whole thing is set-up with idea of microservices architecture in head. Using docker stack, reverse proxy and other 
-    tools this app will wrap your Django application with fancy production ribbon.
+This whole thing is set-up with idea of microservices architecture in head. Using docker stack, tls, reverse proxy and 
+    other tools this app will wrap your Django application with a fancy production ribbon.
 
 ### Prerequisites
-- Any Django application with structure similar to this one - 
-    [Example Django/React application](https://github.com/hrytskivr/mySkeleton "mySkeleton")
+- Any Django application with structure and settings similar to this one - 
+    [**Example Django/React application**](https://git.io/vxEl4 'hrytskivr/mySkeleton')
 
 ### Software requirements
 - **docker** (version _18.02.0-ce_ tested)
@@ -18,5 +18,8 @@ This whole thing is set-up with idea of microservices architecture in head. Usin
 - set required environment variables
 - run `fab init` and watch the magic happen
 
-**NOTE:** there is a set of useful commands defined in _fabfile.py_ to orchestrate the process, e.g. updating your app
-    on the fly as easy as `fab update:app`
+**NOTE:** there is a set of useful commands defined in [**fabfile.py**](https://git.io/vxElt) 
+    to orchestrate the process, e.g. updating/scaling your app on the fly as easy as - `fab update:app`/`fab scale:app`.
+
+**NOTE:** default tls certificate will contain no user data and is not CA verified, if you would like to use your own 
+    certificate please alter [**nginx configuration**](https://git.io/vxEWr 'nginx/sites-enabled/django').
