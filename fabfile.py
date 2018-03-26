@@ -93,3 +93,8 @@ def down(type):
 def get_hash():
     """ return last git commit hash """
     return local('git rev-parse --short HEAD', capture=True)
+
+
+def status():
+    """ get stack services status, escape with Ctrl+C """
+    local('watch docker service ls')
