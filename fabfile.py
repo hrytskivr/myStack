@@ -66,7 +66,7 @@ def build():
 
 
 def storages():
-    """ this creates persistent storage directories for psql and nginx services """
+    """ this creates persistent storage directories for psql & nginx services """
     local('mkdir postgres/storage')
     local('mkdir nginx/logs')
 
