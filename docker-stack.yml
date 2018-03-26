@@ -1,7 +1,7 @@
 version: '3.6'
 
 services:
-  # application and web server
+  # application & web server
   app:
     image: my/app:%COMMIT_HASH%
     deploy:
@@ -24,7 +24,7 @@ services:
       - ./app:/data/app
       - ./nginx/logs:/var/log/nginx
 
-  # database and caching
+  # database & caching
   postgres:
     image: postgres:10.3-alpine
     deploy:
