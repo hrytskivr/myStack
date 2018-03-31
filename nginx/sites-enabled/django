@@ -4,7 +4,7 @@ server {
     server_name 127.0.0.1;
     charset utf-8;
 
-    # redirect requests to https
+    # redirect all incoming requests to https
     return 301 https://$host$request_uri;
 
 }
@@ -14,8 +14,8 @@ server {
     listen 443 ssl;
 
     # ssl configuration
-    ssl_certificate /tls/my.app.crt;
-    ssl_certificate_key /tls/my.app.key;
+    ssl_certificate_key /tls/nginx.key;
+    ssl_certificate /tls/nginx.crt;
     ssl_session_timeout 1d;
     ssl_session_cache shared:SSL:50m;
     ssl_protocols TLSv1.2;
