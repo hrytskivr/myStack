@@ -3,36 +3,41 @@ version: '3.6'
 services:
   # application & web server
   app:
-    image: my/app:%COMMIT_HASH%
+    image: %REGISTRY_URL%/app:%COMMIT_HASH%
     deploy:
       replicas: 1
       restart_policy:
         max_attempts: 5
         delay: 5s
+    env_file: postgres/env
     volumes:
       - ./app:/data/app
-    env_file: postgres/env
-    entrypoint: sh entry.sh
+    entrypoint: sh app.sh
 
   nginx:
-    image: my/nginx:%COMMIT_HASH%
+    image: %REGISTRY_URL%/nginx:%COMMIT_HASH%
     deploy:
       replicas: 1
+      restart_policy:
+        max_attempts: 5
+        delay: 5s
     ports:
       - 80:80
       - 443:443
     volumes:
+      - ./tls/nginx:/tls
       - ./app:/data/app
       - ./nginx/logs:/var/log/nginx
+    entrypoint: sh nginx.sh
 
   # database & caching
   postgres:
     image: postgres:10.3-alpine
     deploy:
       replicas: 1
-    volumes:
-      - ./postgres/storage:/var/lib/postgresql/data
     env_file: postgres/env
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
 
   memcached:
     image: memcached:1.5-alpine
@@ -41,3 +46,8 @@ services:
     entrypoint:
       - memcached
       - -m 64
+
+networks:
+  default:
+    external:
+      name: %APP_NAME%_network

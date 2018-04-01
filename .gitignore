@@ -5,7 +5,7 @@ node_modules
 __pycache__
 app/*
 !app/Dockerfile
-!app/entry.sh
+!app/app.sh
 
 # files
 db.sqlite3
