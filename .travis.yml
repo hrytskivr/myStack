@@ -1,0 +1,25 @@
+sudo: required
+language: python
+python: 3.6.4
+services:
+  - docker
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+
+install:
+  - pip install fabric3
+
+before_script:
+  - docker swarm init
+
+script:
+  - fab init
+  - sleep 30
+  - docker service ls | grep mySkeleton_app | grep 1/1
+  - docker service ls | grep mySkeleton_nginx | grep 1/1
+  - docker service ls | grep mySkeleton_postgres | grep 1/1
+  - docker service ls | grep mySkeleton_memcached | grep 1/1
+
+cache: pip
