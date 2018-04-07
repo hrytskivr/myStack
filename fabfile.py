@@ -94,7 +94,7 @@ def up():
     local(f'docker stack deploy --compose-file docker-stack.yml {APP_NAME}')
 
 
-def down(type):
+def down(type=None):
     """ use this to stop & remove the stack """
     if type == "-f":
         print('\nForced!')
