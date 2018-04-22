@@ -122,7 +122,11 @@ def update(type):
     """ use this to update code base either for 'myStack' or your Django application """
     if type == "stack":
         local('git reset --hard && git pull')
-    if type == "app":
+    elif type == "app":
+        with lcd(f'app/{REPO_NAME}'):
+            local(f'git reset --hard && git pull')
+    elif type == "both":
+        local('git reset --hard && git pull')
         with lcd(f'app/{REPO_NAME}'):
             local(f'git reset --hard && git pull')
     insert_variables()
