@@ -13,6 +13,5 @@ cd %APP_NAME%
 # make & apply migrations
 python manage.py makemigrations && python manage.py migrate
 
-# add worker user & run application on his behalf
-adduser -D -u 111 worker
-su -c "gunicorn %APP_NAME%.wsgi:application -b :8000" worker
+# run application
+gunicorn %APP_NAME%.wsgi:application -b :8000
