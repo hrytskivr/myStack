@@ -6,6 +6,7 @@ __pycache__
 app/*
 !app/Dockerfile
 !app/app.sh
+!app/env
 
 # files
 db.sqlite3
