@@ -21,6 +21,8 @@ APP_NAME = os.environ['APP_NAME']  # name of your Django application
 DB_NAME = os.environ['DB_NAME']
 DB_USER = os.environ['DB_USER']
 DB_PASS = os.environ['DB_PASS']
+DB_ADDRESS = os.environ['DB_ADDRESS']
+DB_PORT = os.environ['DB_PORT']
 
 
 ### MAIN FLOW ###
@@ -46,7 +48,12 @@ def insert_variables():
     """ this will replace template placeholders with provided info """
     local(f'sed -i "s/%COMMIT_HASH%/{get_hash()}/g" docker-stack.yml')
     local(f'sed -i "s/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = [\'{HOST_IP}\']/" app/{REPO_NAME}/{APP_NAME}/settings.py')
-    local(f'sed -i "s/%DB_NAME%/{DB_NAME}/; s/%DB_USER%/{DB_USER}/; s/%DB_PASS%/{DB_PASS}/" postgres/env')
+    local(f'sed -i "s/%DB_NAME%/{DB_NAME}/; '
+                  f's/%DB_USER%/{DB_USER}/; '
+                  f's/%DB_PASS%/{DB_PASS}/; '
+                  f's/%DB_ADDRESS%/{DB_ADDRESS}/; '
+                  f's/%DB_PORT%/{DB_PORT}/" '
+                  'app/env app/app.sh')
     local(f'sed -i "s/%REGISTRY_URL%/{REGISTRY_URL}/g" docker-stack.yml')
     local(f'sed -i "s/%APP_NAME%/{APP_NAME}/g" app/Dockerfile '
                                               'app/app.sh '
@@ -62,8 +69,7 @@ def generate_tls():
 
 
 def create_storages():
-    """ this will create persistent storage directories for postgres, nginx & registry services """
-    local('mkdir postgres/data')
+    """ this will create persistent storage directories for nginx & registry services """
     local('mkdir nginx/logs')
     local('mkdir registry/store')
 
@@ -101,7 +107,7 @@ def down(type=None):
         local(f'docker stack rm {APP_NAME}')
     else:
         print('\nWARNING: will delete all the data inside every container, '
-              'except that are stored as persistent storage e.g. "postgres".')
+              'except that are stored as persistent storage.')
         choice = input('\nProceed? Yes/No\n=> ')
         if choice == 'Yes':
             print('\nConfirmed!')
