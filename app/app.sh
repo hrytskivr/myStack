@@ -10,8 +10,8 @@ done
 # change dir into app folder
 cd %APP_NAME%
 
-# make & apply migrations
-python manage.py makemigrations && python manage.py migrate
+# apply db migrations
+python manage.py migrate
 
 # run application
 gunicorn %APP_NAME%.wsgi:application -b :8000
